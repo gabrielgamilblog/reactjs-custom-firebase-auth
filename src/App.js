@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext, useEffect } from "react";
+import { Route, withRouter } from "react-router-dom";
+import Container from "react-bootstrap/Container";
 
-function App() {
+import { FirebaseContext } from "./firebase";
+import SignIn from "./pages/SignIn";
+import Dashboard from "./pages/Dashboard";
+
+function App(props) {
+  const firebase = useContext(FirebaseContext);
+
+  useEffect(() => {
+    if (firebase) {
+      firebase.auth.onAuthStateChanged(function(user) {
+        if (user) {
+          props.history.replace("/");
+        } else {
+          props.history.replace("/signin");
+        }
+      });
+    }
+  }, [firebase]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Route path="/" exact component={Dashboard} />
+      <Route path="/signin" component={SignIn} />
+    </Container>
   );
 }
 
-export default App;
+export default withRouter(App);
